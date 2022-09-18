@@ -14,13 +14,15 @@ def set():
 	if key == None or val == None:
 		return '<h1>422 Unprocessable Entity</h1>', 422
 	d[key] = val
-	print(d)
 	return ''
 @app.route('/get')
 def get():
 	key = request.args.get('key')
 	if key == None:
 		return '<h1>422 Unprocessable Entity</h1>', 422
-	return d[key]
+	try: 
+		return d[key]
+	except KeyError:
+		return '<h1>422 Unprocessable Entity</h1>'
 		
 app.run(host='0.0.0.0', port=5000)
