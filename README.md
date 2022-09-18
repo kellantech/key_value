@@ -1,5 +1,6 @@
 # key_value
 
 
-A self-hosted key value store. 
+A key value store. 
 
+Host yourself with 
