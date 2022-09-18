@@ -5,8 +5,10 @@ A key value store.
 
 Host yourself with waitress
  
- 
+how to run:
 ```
+https://github.com/kellantech/key_value.git
+cd key_value
 python -m venv venv
 . venv/bin/activate
 pip install waitress
