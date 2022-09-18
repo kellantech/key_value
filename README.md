@@ -3,4 +3,5 @@
 
 A key value store. 
 
-Host yourself with 
+Host yourself with waitress
+ 
