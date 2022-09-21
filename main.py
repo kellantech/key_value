@@ -15,6 +15,7 @@ def set():
 		return '<h1>422 Unprocessable Entity</h1>', 422
 	d[key] = val
 	return ''
+	
 @app.route('/get')
 def get():
 	key = request.args.get('key')
@@ -24,5 +25,19 @@ def get():
 		return d[key]
 	except KeyError:
 		return '<h1>422 Unprocessable Entity</h1>'
-		
+
+@app.route('/all')
+def all():
+	r = ''
+	for k, v in d.items():
+		r+=f"{k}:{v}<br>"
+	return r
+@app.after_request
+def add_header(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+
+
 app.run(host='0.0.0.0', port=5000)
