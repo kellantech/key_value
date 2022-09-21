@@ -9,7 +9,7 @@ how to run:
 ```
 https://github.com/kellantech/key_value.git
 cd key_value
-python -m venv venv
+python3 -m venv venv
 . venv/bin/activate
 pip install waitress
 pip install flask
