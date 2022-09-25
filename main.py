@@ -4,18 +4,26 @@ app = Flask(__name__)
 
 with open("config.json", "r") as f:
 	config = json.load(f)
-d_ip = config["disallow-ip"]
-
+a_ip = config["allow-ip"]
 d = {}
+if a_ip == [] or a_ip == "":
+	raise ValueError("IP access rules required")
+
 @app.before_request
 def before_req():
-    if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
-    	ip = (request.environ['REMOTE_ADDR'])
-    else:
-    	ip = (request.environ['HTTP_X_FORWARDED_FOR']) 
-    if ip in d_ip:
-       return '<h1>401 Unauthorized</h1>', 401
+		if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
+			ip = (request.environ['REMOTE_ADDR'])
+		else:
+			ip = (request.environ['HTTP_X_FORWARDED_FOR'])
+		check = 1
 
+		if a_ip == "*":
+			check = 0
+		if bool(check):	
+			if not(ip in a_ip):
+				return '<h1>401 Unauthorized</h1>', 401 
+	
+			
 @app.route('/')
 def index():
 	return '!'
