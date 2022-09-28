@@ -8,7 +8,16 @@ a_ip = config["allow-ip"]
 d = {}
 if a_ip == [] or a_ip == "":
 	raise ValueError("IP access rules required")
-
+if isinstance(a_ip, list) == True:
+	for e in a_ip:
+		if e.endswith("*"):
+			n = e[:-1]
+			op_list = []
+			for i in range(0,256):
+				op_list.append(f"{n}{i}")
+			a_ip.remove(e)	
+			a_ip.extend(op_list)
+print(a_ip)
 @app.before_request
 def before_req():
 		if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
@@ -57,8 +66,6 @@ def all():
 def add_header(response):
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
-
-
 
 
 app.run(host='0.0.0.0', port=5000)
