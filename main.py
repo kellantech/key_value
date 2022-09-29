@@ -1,11 +1,17 @@
 from flask import Flask, request
-import json
-app = Flask(__name__)
+import json,cryptocode
+def enc(string,key):
+	return cryptocode.encrypt(string,key)
+def dec(encrypt,key):
+	return cryptocode.decrypt(encrypt,key)
 
+app = Flask(__name__)
 with open("config.json", "r") as f:
 	config = json.load(f)
 a_ip = config["allow-ip"]
+enc_key= config['enc-key']
 d = {}
+print(enc_key)
 if a_ip == [] or a_ip == "":
 	raise ValueError("IP access rules required")
 if isinstance(a_ip, list) == True:
@@ -42,16 +48,17 @@ def set():
 	val = request.args.get('val')
 	if key == None or val == None:
 		return '<h1>422 Unprocessable Entity</h1>', 422
-	d[key] = val
+	d[key] = enc(val,enc_key)
 	return ''
 	
 @app.route('/get')
 def get():
+	print(d)
 	key = request.args.get('key')
 	if key == None:
 		return '<h1>422 Unprocessable Entity</h1>', 422
 	try: 
-		return d[key]
+		return dec(d[key],enc_key)
 	except KeyError:
 		return '<h1>422 Unprocessable Entity</h1>'
 
@@ -59,7 +66,7 @@ def get():
 def all():
 	r = ''
 	for k, v in d.items():
-		r+=f"{k}:{v}<br>"
+		r+=f"{k}:{dec(v,enc_key)}<br>"
 	return r
 	
 @app.after_request
