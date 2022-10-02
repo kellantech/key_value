@@ -5,16 +5,14 @@ import json, cryptocode
 def enc(string, key):
     return cryptocode.encrypt(string, key)
 
-
 def dec(encrypt, key):
     return cryptocode.decrypt(encrypt, key)
-
 
 app = Flask(__name__)
 with open("config.json", "r") as f:
     config = json.load(f)
 a_ip = config["allow-ip"]
-enc_key = config['enc-key']
+if_enc = bool(config["encrypt"])
 d = {}
 if a_ip == [] or a_ip == "":
     raise ValueError("IP access rules required")
@@ -46,7 +44,7 @@ def before_req():
 
 @app.route('/')
 def index():
-    return '!'
+    return ''
 
 
 @app.route('/set')
@@ -54,8 +52,13 @@ def set():
     key = request.args.get('key')
     val = request.args.get('val')
     if key == None or val == None:
-        return '<h1>422 Unprocessable Entity</h1>', 422
-    d[key] = enc(val, enc_key)
+        return '<h1>422 Unprocessable Entity</h1>', 422	
+    if if_enc:	
+    	enckey = request.args.get('enkey')
+    
+    	d[key] = enc(val, enckey)
+    else:
+      d[key] = val
     return ''
 
 
@@ -63,14 +66,18 @@ def set():
 def get():
 
     key = request.args.get('key')
-    enk = request.args.get('enkey')
-    res = str(dec(d[key], enk))
     if key == None:
         return '<h1>422 Unprocessable Entity</h1>', 422
     try:
-        return res if res != "False" else "bad encryption key"
+        _ = d[key]
     except KeyError:
-        return '<h1>422 Unprocessable Entity</h1>'
+        return '<h1>422 Unprocessable Entity</h1>' 
+    if if_enc:
+      enk = request.args.get('enkey')
+      res = str(dec(d[key], enk))
+      return res if res != "False" else "bad   encryption key"
+    else:
+      return d[key]
 
 
 @app.route('/all')
