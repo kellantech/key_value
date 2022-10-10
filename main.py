@@ -1,18 +1,28 @@
 from flask import Flask, request
-import json, cryptocode
-
-
-def enc(string, key):
-    return cryptocode.encrypt(string, key)
-
-def dec(encrypt, key):
-    return cryptocode.decrypt(encrypt, key)
+import json
+import encryption_python as en
 
 app = Flask(__name__)
 with open("config.json", "r") as f:
     config = json.load(f)
 a_ip = config["allow-ip"]
 if_enc = bool(config["encrypt"])
+if if_enc:
+  mode = config["encryption-mode"]
+  keyl = config["key-length"]
+def enc(string, key):
+    global mode, keyl
+    k = en.gen_key_from_password(key,keyl)
+    return en.encrypt_aes(string, k,mode)
+
+def dec(string, key):
+    global mode, keyl
+    try:
+      k = en.gen_key_from_password(key,keyl)
+      return en.decrypt_aes(string, k,mode)
+    except:
+      return "either the key is wrong or the data has been tampered with"
+ 
 d = {}
 if a_ip == [] or a_ip == "":
     raise ValueError("IP access rules required")
@@ -25,6 +35,7 @@ if isinstance(a_ip, list) == True:
                 op_list.append(f"{n}{i}")
             a_ip.remove(e)
             a_ip.extend(op_list)
+
 
 
 @app.before_request
